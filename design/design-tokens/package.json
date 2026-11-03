@@ -1,0 +1,11 @@
+{
+  "name": "cashclock-design-tokens",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "style-dictionary build --config config.mjs"
+  },
+  "devDependencies": {
+    "style-dictionary": "5.7.0"
+  }
+}

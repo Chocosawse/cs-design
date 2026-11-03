@@ -1,0 +1,25 @@
+{
+  "pantone": {
+    "$type": "color",
+    "vivaMagenta": {
+      "primary": { "$value": "#BB2649" },
+      "100": { "$value": "#F3CED7" },
+      "300": { "$value": "#DE7C93" },
+      "500": { "$value": "#B42D4C" },
+      "700": { "$value": "#711329" },
+      "900": { "$value": "#2C0710" },
+      "nightMode": { "$value": "#EC7490" },
+      "complement": { "$value": "#26BA98" }
+    },
+    "emerald": {
+      "primary": { "$value": "#009473" },
+      "100": { "$value": "#C4FDF1" },
+      "300": { "$value": "#61FAD9" },
+      "500": { "$value": "#048F71" },
+      "700": { "$value": "#005240" },
+      "900": { "$value": "#002920" },
+      "nightMode": { "$value": "#26EDC2" },
+      "complement": { "$value": "#940020" }
+    }
+  }
+}
