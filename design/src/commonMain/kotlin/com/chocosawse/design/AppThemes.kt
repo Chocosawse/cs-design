@@ -38,7 +38,9 @@ fun AppTheme(
     content: @Composable () -> Unit
 ) {
     val semanticColors = activeToken.toAppColors(isDark = darkTheme)
-    val newScheme = semanticColors.toMaterialColorScheme()
+    val newScheme = semanticColors.toMaterialColorScheme(
+        secondaryContainer = if (darkTheme) activeToken.color900 else activeToken.color100
+    )
 
     MaterialTheme(
         colorScheme =
@@ -304,13 +306,15 @@ fun animateColorSchemeAsState(
  * Feeds AppColors into Material 3 so Material components (Button, Card, TextField...) follow the active palette.
  * Roles AppColors doesn't define keep Material's baseline values.
  */
-private fun AppColors.toMaterialColorScheme(): ColorScheme {
+private fun AppColors.toMaterialColorScheme(secondaryContainer: Color): ColorScheme {
     val baseline = if (isDark) darkColorScheme() else lightColorScheme()
     return baseline.copy(
         primary = brandPrimary,
         onPrimary = readableOn(brandPrimary),
         secondary = brandAccent,
         onSecondary = readableOn(brandAccent),
+        secondaryContainer = secondaryContainer,
+        onSecondaryContainer = readableOn(secondaryContainer),
         background = background,
         onBackground = textPrimary,
         surface = surface,
