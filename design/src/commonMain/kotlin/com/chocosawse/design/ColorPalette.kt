@@ -50,6 +50,14 @@ open class ColorPalette(
     val color900: Color,
     val complement: Color
 ) {
+    companion object {
+        /**
+         * Every built-in palette, in display order, so apps can offer them as theme choices without
+         * listing them by hand. Add new built-in palettes here; AppThemesTest checks everything listed.
+         */
+        val builtIns: List<ColorPalette> by lazy { listOf(PantoneVivaMagenta, PantoneEmerald, PantoneClassicBlue) }
+    }
+
     object PantoneVivaMagenta : ColorPalette(
         name = "Viva Magenta",
         primary = Colors.pantoneVivaMagentaPrimary,

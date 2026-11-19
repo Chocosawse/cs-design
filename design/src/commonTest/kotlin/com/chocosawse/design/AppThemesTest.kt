@@ -9,12 +9,8 @@ import kotlin.test.assertTrue
 
 class AppThemesTest {
 
-    // Add new palettes here so their generated themes are checked too
-    private val palettes = listOf(
-        ColorPalette.PantoneVivaMagenta,
-        ColorPalette.PantoneEmerald,
-        ColorPalette.PantoneClassicBlue
-    )
+    // Every built-in palette is checked; new ones are picked up from ColorPalette.builtIns
+    private val palettes = ColorPalette.builtIns
 
     @Test
     fun `text meets WCAG AA contrast on background and surface`() = assertAllThemes { name, colors ->

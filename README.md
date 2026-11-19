@@ -2,7 +2,7 @@
 
 Compose Multiplatform design system for Android and iOS: palette-driven light/dark themes that feed Material 3.
 
-- `ColorPalette`: a brand palette (built-in Pantone palettes, or your own)
+- `ColorPalette`: a brand palette (built-in Pantone palettes, or your own); `ColorPalette.builtIns` lists the built-ins
 - `AppTheme { }`: provides `AppColors` and a matching `MaterialTheme`; read colors with `AppTheme.colors`
 - Every built-in palette is tested for WCAG AA contrast in light and dark mode
 
