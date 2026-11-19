@@ -14,7 +14,11 @@ class AppThemesTest {
 
     @Test
     fun `text meets WCAG AA contrast on background and surface`() = assertAllThemes { name, colors ->
-        listOf("background" to colors.background, "surface" to colors.surface).flatMap { (bgName, bg) ->
+        listOf(
+            "background" to colors.background,
+            "surface" to colors.surface,
+            "secondaryContainer" to colors.secondaryContainer
+        ).flatMap { (bgName, bg) ->
             listOfNotNull(
                 checkOpaque(bg, "$name $bgName"),
                 checkContrast(4.5, colors.textPrimary, bg, "$name textPrimary on $bgName"),

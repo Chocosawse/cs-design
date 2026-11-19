@@ -23,6 +23,8 @@ data class AppColors(
     val brandPrimary: Color,
     // Not contrast-safe on background in every theme (e.g. Viva Magenta light, Emerald dark); use for fills, not text
     val brandAccent: Color,
+    // Tinted fill for chips, selected nav items and tonal buttons (Material's secondaryContainer)
+    val secondaryContainer: Color,
     val isDark: Boolean
 )
 
@@ -38,9 +40,7 @@ fun AppTheme(
     content: @Composable () -> Unit
 ) {
     val semanticColors = activeToken.toAppColors(isDark = darkTheme)
-    val newScheme = semanticColors.toMaterialColorScheme(
-        secondaryContainer = if (darkTheme) activeToken.color900 else activeToken.color100
-    )
+    val newScheme = semanticColors.toMaterialColorScheme()
 
     MaterialTheme(
         colorScheme =
@@ -306,7 +306,7 @@ fun animateColorSchemeAsState(
  * Feeds AppColors into Material 3 so Material components (Button, Card, TextField...) follow the active palette.
  * Roles AppColors doesn't define keep Material's baseline values.
  */
-private fun AppColors.toMaterialColorScheme(secondaryContainer: Color): ColorScheme {
+private fun AppColors.toMaterialColorScheme(): ColorScheme {
     val baseline = if (isDark) darkColorScheme() else lightColorScheme()
     return baseline.copy(
         primary = brandPrimary,

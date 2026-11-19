@@ -18,7 +18,8 @@ fun ColorPalette.toAppColors(isDark: Boolean): AppColors {
             textPrimary = this.color900,
             textSecondary = this.color700,
             isDark = false,
-            brandAccent = this.complement
+            brandAccent = this.complement,
+            secondaryContainer = this.color100
         )
     } else {
         // --- NIGHT / DARK SCHEME ---
@@ -30,7 +31,8 @@ fun ColorPalette.toAppColors(isDark: Boolean): AppColors {
             textPrimary = Color(0xFFFFFFFF),
             textSecondary = this.color100,
             isDark = true,
-            brandAccent = this.complement
+            brandAccent = this.complement,
+            secondaryContainer = this.color900
         )
     }
 }
