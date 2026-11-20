@@ -4,10 +4,13 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -25,6 +28,8 @@ data class AppColors(
     val brandAccent: Color,
     // Tinted fill for chips, selected nav items and tonal buttons (Material's secondaryContainer)
     val secondaryContainer: Color,
+    // Error text and icons; contrast-checked against background and surface
+    val error: Color,
     val isDark: Boolean
 )
 
@@ -37,10 +42,12 @@ fun AppTheme(
     activeToken: ColorPalette = ColorPalette.PantoneVivaMagenta, // Can be swapped dynamically at runtime
     darkTheme: Boolean = isSystemInDarkTheme(),
     animateChanges: Boolean = true,
+    typography: Typography = MaterialTheme.typography,
+    shapes: Shapes = MaterialTheme.shapes,
     content: @Composable () -> Unit
 ) {
     val semanticColors = activeToken.toAppColors(isDark = darkTheme)
-    val newScheme = semanticColors.toMaterialColorScheme()
+    val newScheme = activeToken.toMaterialColorScheme(isDark = darkTheme)
 
     MaterialTheme(
         colorScheme =
@@ -50,7 +57,9 @@ fun AppTheme(
                     animationSpec = tween(durationMillis = 300))
             } else {
                 newScheme
-            }
+            },
+        typography = typography,
+        shapes = shapes
     ) {
         CompositionLocalProvider(
             LocalAppColors provides semanticColors,
@@ -303,26 +312,57 @@ fun animateColorSchemeAsState(
 }
 
 /**
- * Feeds AppColors into Material 3 so Material components (Button, Card, TextField...) follow the active palette.
- * Roles AppColors doesn't define keep Material's baseline values.
+ * Feeds the palette into Material 3 so Material components (Button, Card, TextField...) follow it.
+ * Every role is derived from the palette except primaryContainer, tertiary*, errorContainer, the *Fixed roles
+ * and scrim, which keep Material's baseline values.
  */
-private fun AppColors.toMaterialColorScheme(): ColorScheme {
+internal fun ColorPalette.toMaterialColorScheme(isDark: Boolean): ColorScheme {
+    val colors = toAppColors(isDark)
+    val surface = colors.surface
+    // Containers step from the surface toward a mid shade: darker in light mode, lighter in dark mode
+    val containerTarget = if (isDark) color700 else color300
+    fun container(step: Float) = lerp(surface, containerTarget, step)
+    val surfaceContainerHighest = container(0.24f)
     val baseline = if (isDark) darkColorScheme() else lightColorScheme()
     return baseline.copy(
-        primary = brandPrimary,
-        onPrimary = readableOn(brandPrimary),
-        secondary = brandAccent,
-        onSecondary = readableOn(brandAccent),
-        secondaryContainer = secondaryContainer,
-        onSecondaryContainer = readableOn(secondaryContainer),
-        background = background,
-        onBackground = textPrimary,
+        primary = colors.brandPrimary,
+        onPrimary = readableOn(colors.brandPrimary),
+        // Tints elevated surfaces with the brand colour
+        surfaceTint = colors.brandPrimary,
+        // The other mode's primary, so it stands out on inverseSurface
+        inversePrimary = if (isDark) primary else primaryNight,
+        secondary = colors.brandAccent,
+        onSecondary = readableOn(colors.brandAccent),
+        secondaryContainer = colors.secondaryContainer,
+        onSecondaryContainer = readableOn(colors.secondaryContainer),
+        background = colors.background,
+        onBackground = colors.textPrimary,
         surface = surface,
-        onSurface = textPrimary,
-        onSurfaceVariant = textSecondary,
+        onSurface = colors.textPrimary,
+        onSurfaceVariant = colors.textSecondary,
+        // Same as surfaceContainerHighest, as in Material's baseline
+        surfaceVariant = surfaceContainerHighest,
+        // Lowest is the surface itself; each level is a small step further toward containerTarget
+        surfaceContainerLowest = surface,
+        surfaceContainerLow = container(0.06f),
+        surfaceContainer = container(0.12f),
+        surfaceContainerHigh = container(0.18f),
+        surfaceContainerHighest = surfaceContainerHighest,
+        // The surface is the bright end in light mode and the dim end in dark mode
+        surfaceDim = if (isDark) surface else container(0.3f),
+        surfaceBright = if (isDark) container(0.3f) else surface,
+        // Snackbars and tooltips: the opposite end of the palette
+        inverseSurface = if (isDark) color100 else color900,
+        inverseOnSurface = if (isDark) color900 else color100,
+        // Mid shade for borders; outlineVariant is a subtler divider (color300 in light, half a step from the
+        // dark surface toward color700 in dark)
+        outline = color500,
+        outlineVariant = if (isDark) container(0.5f) else color300,
+        error = colors.error,
+        onError = readableOn(colors.error),
     )
 }
 
 // Black or white, whichever has more contrast against color (0.179 is the WCAG luminance crossover)
-private fun readableOn(color: Color): Color =
+internal fun readableOn(color: Color): Color =
     if (color.luminance() > 0.179f) Color.Black else Color.White
