@@ -1,5 +1,7 @@
 package com.chocosawse.design
 
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 
@@ -14,12 +16,13 @@ fun ColorPalette.toAppColors(isDark: Boolean): AppColors {
             brandPrimary = this.primary,
             // color300 is too dark for primary (brand) and color700 (secondary text) to stand out on
             background = this.color100,
-            surface = Color(0xFFFFFFFF),
+            surface = this.surface ?: Color(0xFFFFFFFF),
             textPrimary = this.color900,
             textSecondary = this.color700,
             isDark = false,
             brandAccent = this.complement,
-            secondaryContainer = this.color100
+            secondaryContainer = this.color100,
+            error = this.error ?: lightColorScheme().error
         )
     } else {
         // --- NIGHT / DARK SCHEME ---
@@ -27,19 +30,24 @@ fun ColorPalette.toAppColors(isDark: Boolean): AppColors {
             brandPrimary = this.primaryNight,
             background = this.color900,
             // Opaque and a step lighter than background; there's no 800 shade, so blend 900 and 700
-            surface = lerp(this.color900, this.color700, 0.5f),
+            surface = this.surfaceNight ?: lerp(this.color900, this.color700, 0.5f),
             textPrimary = Color(0xFFFFFFFF),
             textSecondary = this.color100,
             isDark = true,
             brandAccent = this.complement,
-            secondaryContainer = this.color900
+            secondaryContainer = this.color900,
+            error = this.errorNight ?: darkColorScheme().error
         )
     }
 }
 
 /**
- * A brand palette. The nested objects are the built-in Pantone palettes; apps can add their own with
+ * A brand palette. The nested objects are the built-in palettes; apps can add their own with
  * `ColorPalette(name = ..., primary = ..., ...)` or by subclassing.
+ *
+ * The optional roles default to null, which keeps the standard mapping: a white light surface, a dark surface
+ * blended from color900 and color700, and Material's baseline error colours. Check custom palettes with
+ * [contrastIssues].
  */
 open class ColorPalette(
     open val name: String,
@@ -50,14 +58,20 @@ open class ColorPalette(
     val color500: Color,
     val color700: Color,
     val color900: Color,
-    val complement: Color
+    val complement: Color,
+    val surface: Color? = null,
+    val surfaceNight: Color? = null,
+    val error: Color? = null,
+    val errorNight: Color? = null
 ) {
     companion object {
         /**
          * Every built-in palette, in display order, so apps can offer them as theme choices without
          * listing them by hand. Add new built-in palettes here; AppThemesTest checks everything listed.
          */
-        val builtIns: List<ColorPalette> by lazy { listOf(PantoneVivaMagenta, PantoneEmerald, PantoneClassicBlue) }
+        val builtIns: List<ColorPalette> by lazy {
+            listOf(PantoneVivaMagenta, PantoneEmerald, PantoneClassicBlue, Newspaper)
+        }
     }
 
     object PantoneVivaMagenta : ColorPalette(
@@ -94,5 +108,22 @@ open class ColorPalette(
         color700 = Color(0xFF072B4B),
         color900 = Color(0xFF031626),
         complement = Color(0xFF80440F)
+    )
+
+    // Off-white paper and near-black ink, with a brick-red accent
+    object Newspaper: ColorPalette(
+        name = "Newspaper",
+        primary = Color(0xFF141414),
+        primaryNight = Color(0xFFF5F2EC),
+        color100 = Color(0xFFF5F2EC),
+        color300 = Color(0xFFD8D2C7),
+        color500 = Color(0xFF8C867C),
+        color700 = Color(0xFF55514B),
+        color900 = Color(0xFF141414),
+        complement = Color(0xFFA3523A),
+        surface = Color(0xFFF5F2EC),
+        surfaceNight = Color(0xFF141414),
+        error = Color(0xFFA3523A),
+        errorNight = Color(0xFFE39A7F)
     )
 }
